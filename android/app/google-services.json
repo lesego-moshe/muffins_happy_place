@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "706610153720",
+    "project_id": "muffin-s-happy-place",
+    "storage_bucket": "muffin-s-happy-place.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:706610153720:android:b66184cd5b881cee09d30d",
+        "android_client_info": {
+          "package_name": "com.example.muffins_happy_place"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "706610153720-n3qd1ns9krok57n3aqf6pd57p4h9u553.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDFkzPngBqwOh8xq4gowf9nYwOhcOCtA3I"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "706610153720-n3qd1ns9krok57n3aqf6pd57p4h9u553.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
