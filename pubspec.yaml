@@ -75,6 +75,9 @@ dependencies:
   path_provider:
   record: ^4.4.4
   provider:
+  http: ^0.13.5
+  geolocator: ^10.0.1
+  geocoding: ^2.1.1
 dev_dependencies:
   flutter_test:
     sdk: flutter

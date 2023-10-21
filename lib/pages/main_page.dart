@@ -3,6 +3,9 @@ import 'dart:math';
 import 'package:confetti/confetti.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
+import 'package:muffins_happy_place/services/weather_service.dart';
+
+import '../models/weather_model.dart';
 
 class MainPage extends StatefulWidget {
   const MainPage({Key key}) : super(key: key);
@@ -12,8 +15,61 @@ class MainPage extends StatefulWidget {
 }
 
 class _MainPageState extends State<MainPage> {
+  final _weatherService = WeatherService('72d5ccce062fdde85cb5049924aab18d');
+  Weather _weather;
+  bool isDayTime() {
+    int hour = DateTime.now().hour;
+    return hour > 6 && hour < 20;
+  }
+
   final _controller = ConfettiController();
   bool isPlaying = false;
+
+  _fetchWeather() async {
+    String cityName = await _weatherService.getCurrentCity();
+
+    try {
+      final weather = await _weatherService.getWeather(cityName);
+      setState(() {
+        _weather = weather;
+      });
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  String getWeatherAnimation(String mainCondition, bool isDayTime) {
+    if (mainCondition == null) return 'lib/images/sunny.json';
+
+    switch (mainCondition.toLowerCase()) {
+      case 'clouds':
+      case 'mist':
+      case 'smoke':
+      case 'haze':
+      case 'dust':
+      case 'fog':
+        return 'lib/images/cloudy.json';
+      case 'rain':
+      case 'drizzle':
+        return isDayTime
+            ? 'lib/images/rainwithsun.json'
+            : 'lib/images/rainynight.json';
+      case 'thunderstorm':
+        return 'lib/images/thunderstorm.json';
+      case 'clear':
+        return isDayTime
+            ? 'lib/images/sunny.json'
+            : 'lib/images/clearnight.json';
+      default:
+        return 'lib/images/sunny.json';
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchWeather();
+  }
 
   String calculateDuration() {
     final startDate = DateTime(2017, 12, 7);
@@ -97,7 +153,40 @@ class _MainPageState extends State<MainPage> {
             ]),
             const SizedBox(
               height: 10,
-            )
+            ),
+            Container(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    _weather?.cityName ?? "Loading Area...",
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 20,
+                        color: Colors.pink.shade200),
+                  ),
+                  Lottie.asset(
+                      getWeatherAnimation(_weather?.mainCondition, isDayTime()),
+                      height: 100),
+                  Text(
+                    '${_weather?.temperature?.round()}°C' ??
+                        "Loading Temperature...",
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 20,
+                      color: Colors.pink.shade200,
+                    ),
+                  ),
+                  Text(
+                    _weather?.mainCondition ?? "",
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 20,
+                        color: Colors.pink.shade200),
+                  ),
+                ],
+              ),
+            ),
           ],
         ),
       ),
