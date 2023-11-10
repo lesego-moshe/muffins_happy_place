@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_advanced_calendar/flutter_advanced_calendar.dart';
 import 'package:intl/intl.dart';
 import 'package:lottie/lottie.dart';
+import 'package:muffins_happy_place/components/my_button.dart';
+import 'package:muffins_happy_place/pages/period_tracking_page.dart';
 
 import '../models/event.dart';
 
@@ -136,10 +138,9 @@ class _CalendarState extends State<Calendar> {
                   builder: (BuildContext context,
                       AsyncSnapshot<List<Event>> snapshot) {
                     if (snapshot.hasData) {
-                      // Sort the events by date
                       List<Event> sortedEvents = List.from(snapshot.data)
                         ..sort((a, b) => a.date.compareTo(b.date));
-                      // Find the next event
+
                       Event nextEvent = sortedEvents.firstWhere(
                           (event) => event.date.isAfter(DateTime.now()),
                           orElse: () => null);
@@ -178,6 +179,18 @@ class _CalendarState extends State<Calendar> {
                                       fontWeight: FontWeight.bold,
                                       color: Colors.pinkAccent),
                                 ),
+                          const SizedBox(
+                            height: 20,
+                          ),
+                          MyButton(
+                              onTap: () {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            PeriodTrackerScreen()));
+                              },
+                              text: "Track period")
                           // Display the selected day's events message
                           // Text(
                           //   selectedDayEventsMessage,
