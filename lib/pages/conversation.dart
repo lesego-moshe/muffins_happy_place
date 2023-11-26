@@ -9,14 +9,18 @@ import 'package:liquid_pull_to_refresh/liquid_pull_to_refresh.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:record/record.dart';
 import 'package:sizer/sizer.dart';
+import 'package:swipe_to/swipe_to.dart';
 
 import '../components/message_bubble.dart';
 import '../models/message.dart';
 
 class ConversationPage extends StatefulWidget {
   final Map<String, dynamic> user;
+  final ValueChanged<Message> onSwipedMessage;
 
-  const ConversationPage({Key key, @required this.user}) : super(key: key);
+  const ConversationPage(
+      {Key key, @required this.user, @required this.onSwipedMessage})
+      : super(key: key);
 
   @override
   State<ConversationPage> createState() => _ConversationPageState();
@@ -32,6 +36,8 @@ class _ConversationPageState extends State<ConversationPage> {
   final _audioRecorder = Record();
   bool isRecordingAudio = false;
   String audioFilePath;
+  Message replyMessage;
+  var focusNode = FocusNode();
 
   void sendMessage(String senderId, String content, MessageType type) {
     final message = Message(
@@ -61,6 +67,18 @@ class _ConversationPageState extends State<ConversationPage> {
       textValueNotifier.value = messageController.text;
     });
     fetchMessages();
+    focusNode = FocusNode();
+  }
+
+  onSwipedMessage(Message message) {
+    replyToMessage(message);
+    focusNode.requestFocus();
+  }
+
+  void replyToMessage(Message message) {
+    setState(() {
+      replyMessage = message;
+    });
   }
 
   Future<void> fetchMessages() async {
@@ -126,6 +144,7 @@ class _ConversationPageState extends State<ConversationPage> {
   @override
   void dispose() {
     _audioRecorder.dispose();
+    focusNode.dispose();
     super.dispose();
   }
 
@@ -161,11 +180,11 @@ class _ConversationPageState extends State<ConversationPage> {
                     // Add more options here
                   ],
                   cancelButton: CupertinoActionSheetAction(
-                    child: const Text('Cancel'),
                     isDefaultAction: true,
                     onPressed: () {
                       Navigator.pop(context);
                     },
+                    child: const Text('Cancel'),
                   ),
                 ),
               );
@@ -233,14 +252,18 @@ class _ConversationPageState extends State<ConversationPage> {
                                 onPressed: () {},
                               ),
                           ],
-                          child: Material(
-                            type: MaterialType.transparency,
-                            child: MessageBubble(
-                              text: message.content,
-                              isSender: isSender,
-                              onTap: () {
-                                clearSelectedMessage();
-                              },
+                          child: SwipeTo(
+                            iconColor: Colors.pinkAccent,
+                            onRightSwipe: () => onSwipedMessage(message),
+                            child: Material(
+                              type: MaterialType.transparency,
+                              child: MessageBubble(
+                                text: message.content,
+                                isSender: isSender,
+                                onTap: () {
+                                  clearSelectedMessage();
+                                },
+                              ),
                             ),
                           ),
                         ),
@@ -277,6 +300,7 @@ class _ConversationPageState extends State<ConversationPage> {
                                 final pickedVideo = await ImagePicker()
                                     .getVideo(source: ImageSource.camera);
                                 // Do something with the picked video here
+
                                 Navigator.pop(context);
                               },
                             ),
@@ -341,6 +365,7 @@ class _ConversationPageState extends State<ConversationPage> {
                         } else {
                           // Show the text field when not recording audio.
                           return TextField(
+                            focusNode: focusNode,
                             textCapitalization: TextCapitalization.sentences,
                             controller: messageController,
                             obscureText: false,
