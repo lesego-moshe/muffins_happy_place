@@ -8,7 +8,7 @@ import '../components/my_fab.dart';
 import '../data/habit_database.dart';
 
 class HabitTrackerPage extends StatefulWidget {
-  const HabitTrackerPage({Key key}) : super(key: key);
+  const HabitTrackerPage({Key? key}) : super(key: key);
 
   @override
   State<HabitTrackerPage> createState() => _HabitTrackerPageState();
@@ -116,7 +116,7 @@ class _HabitTrackerPageState extends State<HabitTrackerPage> {
                   return HabitTile(
                     habitName: db.todaysHabitList[index][0],
                     habitCompleted: db.todaysHabitList[index][1],
-                    onChanged: (value) => checkBoxTapped(value, index),
+                    onChanged: (value) => checkBoxTapped(value!, index),
                     editTapped: (context) => openHabitSettings(index),
                     deleteTapped: (context) => deleteHabit(index),
                   );

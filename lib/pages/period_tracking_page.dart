@@ -2,55 +2,55 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class PeriodTrackerScreen extends StatefulWidget {
-  const PeriodTrackerScreen({Key key}) : super(key: key);
+  const PeriodTrackerScreen({Key? key}) : super(key: key);
 
   @override
   _PeriodTrackerScreenState createState() => _PeriodTrackerScreenState();
 }
 
 class _PeriodTrackerScreenState extends State<PeriodTrackerScreen> {
-  DateTime _selectedDate;
+  DateTime? _selectedDate;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   List<DateTime> periodDates = [];
 
   @override
   void initState() {
     super.initState();
-    _fetchPeriodDates();
+    // _fetchPeriodDates();
   }
 
-  Future<void> _selectDate(BuildContext context) async {
-    final DateTime picked = await showDatePicker(
-      context: context,
-      initialDate: _selectedDate ?? DateTime.now(),
-      firstDate: DateTime(2015, 8),
-      lastDate: DateTime(2101),
-    );
-    if (picked != null && picked != _selectedDate) {
-      setState(() {
-        _selectedDate = picked;
-      });
-    }
-  }
+  // Future<void> _selectDate(BuildContext context) async {
+  //   final DateTime picked = await showDatePicker(
+  //     context: context,
+  //     initialDate: _selectedDate ?? DateTime.now(),
+  //     firstDate: DateTime(2015, 8),
+  //     lastDate: DateTime(2101),
+  //   );
+  //   if (picked != null && picked != _selectedDate) {
+  //     setState(() {
+  //       _selectedDate = picked;
+  //     });
+  //   }
+  // }
 
-  Future<void> _logPeriodDate() async {
-    if (_selectedDate != null) {
-      await _firestore.collection('periodDates').add({
-        'date': _selectedDate,
-      });
-      _fetchPeriodDates();
-    }
-  }
+  // Future<void> _logPeriodDate() async {
+  //   if (_selectedDate != null) {
+  //     await _firestore.collection('periodDates').add({
+  //       'date': _selectedDate,
+  //     });
+  //     _fetchPeriodDates();
+  //   }
+  // }
 
-  Future<void> _fetchPeriodDates() async {
-    final snapshot = await _firestore.collection('periodDates').get();
-    final dates = snapshot.docs
-        .map((doc) => (doc.data() as Map)['date'].toDate())
-        .toList();
-    setState(() {
-      periodDates = dates;
-    });
-  }
+  // Future<void> _fetchPeriodDates() async {
+  //   final snapshot = await _firestore.collection('periodDates').get();
+  //   final dates = snapshot.docs
+  //       .map((doc) => (doc.data() as Map)['date'].toDate())
+  //       .toList();
+  //   setState(() {
+  //     periodDates = dates;
+  //   });
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -101,19 +101,19 @@ class _PeriodTrackerScreenState extends State<PeriodTrackerScreen> {
     );
   }
 
-  DateTime _calculateNextPeriodDate() {
-    if (periodDates.isEmpty) {
-      return null;
-    }
-    final lastPeriodDate = periodDates.last;
-    final cycleLength = 28; // Replace with your actual cycle length
-    return lastPeriodDate.add(Duration(days: cycleLength));
-  }
+  // DateTime _calculateNextPeriodDate() {
+  //   if (periodDates.isEmpty) {
+  //     return null;
+  //   }
+  //   final lastPeriodDate = periodDates.last;
+  //   final cycleLength = 28; // Replace with your actual cycle length
+  //   return lastPeriodDate.add(Duration(days: cycleLength));
+  // }
 
-  DateTime _calculateFertilityWindow() {
-    final nextPeriodDate = _calculateNextPeriodDate();
-    return nextPeriodDate != null
-        ? nextPeriodDate.subtract(const Duration(days: 14))
-        : null;
-  }
+  // DateTime _calculateFertilityWindow() {
+  //   final nextPeriodDate = _calculateNextPeriodDate();
+  //   return nextPeriodDate != null
+  //       ? nextPeriodDate.subtract(const Duration(days: 14))
+  //       : null;
+  // }
 }

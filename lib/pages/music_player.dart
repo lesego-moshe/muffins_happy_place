@@ -5,18 +5,19 @@ import 'package:sizer/sizer.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
 class MusicPlayerPage extends StatefulWidget {
-  final String url;
-  final String message;
+  final String? url;
+  final String? message;
 
-  MusicPlayerPage({Key key, this.url, this.message}) : super(key: key);
+  MusicPlayerPage({Key? key, this.url, this.message}) : super(key: key);
 
   @override
   _MusicPlayerPageState createState() => _MusicPlayerPageState();
 }
 
 class _MusicPlayerPageState extends State<MusicPlayerPage> {
-  YoutubePlayerController _controller;
+  late YoutubePlayerController _controller;
   bool _isLooping = false;
+  late var videoId = YoutubePlayer.convertUrlToId(widget.url!);
 
   void listener() {
     if (_controller.value.playerState == PlayerState.ended && _isLooping) {
@@ -36,7 +37,7 @@ class _MusicPlayerPageState extends State<MusicPlayerPage> {
   void initState() {
     super.initState();
     _controller = YoutubePlayerController(
-      initialVideoId: YoutubePlayer.convertUrlToId(widget.url),
+      initialVideoId: videoId!,
       flags: const YoutubePlayerFlags(
         showLiveFullscreenButton: false,
         hideControls: true,
@@ -69,7 +70,7 @@ class _MusicPlayerPageState extends State<MusicPlayerPage> {
               _controller.addListener(listener);
             },
           ),
-          SizedBox(
+          const SizedBox(
             height: 15,
           ),
           Center(
@@ -82,7 +83,7 @@ class _MusicPlayerPageState extends State<MusicPlayerPage> {
                   color: Colors.pink.shade200),
             ),
           ),
-          SizedBox(
+          const SizedBox(
             height: 5,
           ),
           Center(
@@ -198,7 +199,7 @@ class _MusicPlayerPageState extends State<MusicPlayerPage> {
                 text: TextSpan(
                   style: Theme.of(context)
                       .textTheme
-                      .subtitle1
+                      .titleMedium!
                       .copyWith(color: Colors.black.withOpacity(0.5)),
                   children: <TextSpan>[
                     TextSpan(

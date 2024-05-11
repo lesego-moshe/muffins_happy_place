@@ -8,7 +8,7 @@ class MonthlySummary extends StatelessWidget {
   final String startDate;
 
   const MonthlySummary(
-      {Key key, @required this.datasets, @required this.startDate})
+      {Key? key, required this.datasets, required this.startDate})
       : super(key: key);
 
   @override

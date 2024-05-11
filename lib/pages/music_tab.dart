@@ -7,7 +7,7 @@ import 'package:muffins_happy_place/pages/upload_song_page.dart';
 import 'music_player.dart';
 
 class MusicTab extends StatefulWidget {
-  const MusicTab({Key key}) : super(key: key);
+  const MusicTab({Key? key}) : super(key: key);
 
   @override
   State<MusicTab> createState() => _MusicTabState();
@@ -37,7 +37,7 @@ class _MusicTabState extends State<MusicTab> {
           }
 
           return ListView(
-            children: snapshot.data.docs.map((DocumentSnapshot document) {
+            children: snapshot.data!.docs.map((DocumentSnapshot document) {
               Map<String, dynamic> data =
                   document.data() as Map<String, dynamic>;
               return ListTile(

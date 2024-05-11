@@ -5,10 +5,7 @@ class MyTextBox extends StatelessWidget {
   final String sectionName;
   final void Function() onPressed;
   const MyTextBox(
-      {
-      @required this.text,
-      @required this.sectionName,
-      @required this.onPressed});
+      {required this.text, required this.sectionName, required this.onPressed});
 
   @override
   Widget build(BuildContext context) {

@@ -5,14 +5,13 @@ import 'package:muffins_happy_place/pages/music_tab.dart';
 import 'memories_tab.dart';
 
 class MediaPage extends StatefulWidget {
-  const MediaPage({Key key}) : super(key: key);
+  const MediaPage({Key? key}) : super(key: key);
 
   @override
   State<MediaPage> createState() => _MediaPageState();
 }
 
-class _MediaPageState extends State<MediaPage>
-    with SingleTickerProviderStateMixin {
+class _MediaPageState extends State<MediaPage> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     TabController _tabController = TabController(length: 3, vsync: this);
@@ -20,87 +19,92 @@ class _MediaPageState extends State<MediaPage>
     return SafeArea(
       child: Scaffold(
         backgroundColor: Colors.white,
-        body: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Container(
-            //   padding: const EdgeInsets.only(
-            //     left: 20,
-            //     top: 70,
-            //   ),
-            //   child: Row(
-            //     children: [
-            //       Icon(Icons.menu, size: 30, color: Colors.black54),
-            //       Expanded(child: Container()),
-            //       Container(
-            //         width: 30,
-            //         height: 30,
-            //         decoration: BoxDecoration(
-            //           borderRadius: BorderRadius.circular(8),
-            //           color: Colors.grey[500],
-            //         ),
-            //       ),
-            //       SizedBox(
-            //         width: 20,
-            //       )
-            //     ],
-            //   ),
-            // ),
-            // const SizedBox(
-            //   height: 30,
-            // ),
-            // Container(
-            //     padding: const EdgeInsets.only(left: 20),
-            //     child: const BigAppText(text: "Discover", size: 30)),
-            // const SizedBox(
-            //   height: 30,
-            // ),
-            Container(
-              color: Colors.white12,
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: TabBar(
-                    indicator: CircleTabIndicator(
-                      color: Colors.pink.shade100,
-                      radius: 5,
-                    ),
-                    isScrollable: true,
-                    labelPadding: const EdgeInsets.only(
-                      left: 20,
-                      right: 20,
-                    ),
-                    controller: _tabController,
-                    labelColor: Colors.pink.shade200,
-                    unselectedLabelColor: Colors.grey,
-                    tabs: [
-                      Tab(
-                        text: "Memories",
-                      ),
-                      Tab(
-                        text: "Music",
-                      ),
-                      Tab(
-                        text: "Games",
-                      ),
-                    ]),
-              ),
+        body: SingleChildScrollView(
+          child: Container(
+            height: MediaQuery.of(context).size.height,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Container(
+                //   padding: const EdgeInsets.only(
+                //     left: 20,
+                //     top: 70,
+                //   ),
+                //   child: Row(
+                //     children: [
+                //       Icon(Icons.menu, size: 30, color: Colors.black54),
+                //       Expanded(child: Container()),
+                //       Container(
+                //         width: 30,
+                //         height: 30,
+                //         decoration: BoxDecoration(
+                //           borderRadius: BorderRadius.circular(8),
+                //           color: Colors.grey[500],
+                //         ),
+                //       ),
+                //       SizedBox(
+                //         width: 20,
+                //       )
+                //     ],
+                //   ),
+                // ),
+                // const SizedBox(
+                //   height: 30,
+                // ),
+                // Container(
+                //     padding: const EdgeInsets.only(left: 20),
+                //     child: const BigAppText(text: "Discover", size: 30)),
+                // const SizedBox(
+                //   height: 30,
+                // ),
+                Container(
+                  color: Colors.white12,
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: TabBar(
+                        indicator: CircleTabIndicator(
+                          color: Colors.pink.shade100,
+                          radius: 5,
+                        ),
+                        isScrollable: true,
+                        labelPadding: const EdgeInsets.only(
+                          left: 20,
+                          right: 20,
+                        ),
+                        controller: _tabController,
+                        labelColor: Colors.pink.shade200,
+                        unselectedLabelColor: Colors.grey,
+                        tabs: const [
+                          Tab(
+                            text: "Memories",
+                          ),
+                          Tab(
+                            text: "Music",
+                          ),
+                          Tab(
+                            text: "Games",
+                          ),
+                        ]),
+                  ),
+                ),
+                Expanded(
+                  child: Container(
+                    width: double.maxFinite,
+                    height: double.maxFinite,
+                    child: TabBarView(
+                        controller: _tabController,
+                        children: [MemoriesTab(), MusicTab(), GamesTab()]),
+                  ),
+                ),
+                // const SizedBox(
+                //   height: 30,
+                // ),
+                // Container(
+                //     padding: const EdgeInsets.only(left: 20),
+                //     child: BigAppText(text: "Explore more", size: 20)),
+              ],
             ),
-            Expanded(
-              child: Container(
-                width: double.maxFinite,
-                height: double.maxFinite,
-                child: TabBarView(
-                    controller: _tabController,
-                    children: [MemoriesTab(), MusicTab(), GamesTab()]),
-              ),
-            ),
-            // const SizedBox(
-            //   height: 30,
-            // ),
-            // Container(
-            //     padding: const EdgeInsets.only(left: 20),
-            //     child: BigAppText(text: "Explore more", size: 20)),
-          ],
+          ),
         ),
       ),
     );
@@ -111,10 +115,10 @@ class CircleTabIndicator extends Decoration {
   final Color color;
   double radius;
 
-  CircleTabIndicator({@required this.color, @required this.radius});
+  CircleTabIndicator({required this.color, required this.radius});
 
   @override
-  BoxPainter createBoxPainter([VoidCallback onChanged]) {
+  BoxPainter createBoxPainter([VoidCallback? onChanged]) {
     return _CirclePainter(color: color, radius: radius);
   }
 }
@@ -122,7 +126,7 @@ class CircleTabIndicator extends Decoration {
 class _CirclePainter extends BoxPainter {
   final double radius;
   Color color;
-  _CirclePainter({@required this.color, @required this.radius});
+  _CirclePainter({required this.color, required this.radius});
 
   @override
   void paint(Canvas canvas, Offset offset, ImageConfiguration cfg) {
@@ -130,7 +134,7 @@ class _CirclePainter extends BoxPainter {
     _paint = Paint()..color = color;
     _paint = _paint..isAntiAlias = true;
     final Offset circleOffset =
-        offset + Offset(cfg.size.width / 2, cfg.size.height - radius);
+        offset + Offset(cfg.size!.width / 2, cfg.size!.height - radius);
     canvas.drawCircle(circleOffset, radius, _paint);
   }
 }
@@ -138,7 +142,7 @@ class _CirclePainter extends BoxPainter {
 class BigAppText extends StatelessWidget {
   final String text;
   final int size;
-  const BigAppText({Key key, @required this.text, @required this.size})
+  const BigAppText({Key? key, required this.text, required this.size})
       : super(key: key);
 
   @override
@@ -152,58 +156,3 @@ class BigAppText extends StatelessWidget {
     );
   }
 }
-
-
-
-
-    // SafeArea(
-    //   child: DefaultTabController(
-    //     length: 3,
-    //     child: Scaffold(
-    //       // appBar: AppBar(
-    //       //   title: Text(
-    //       //     "M E D I A",
-    //       //     style: TextStyle(color: Colors.pinkAccent),
-    //       //   ),
-    //       //   backgroundColor: Colors.white10,
-    //       //   elevation: 0,
-    //       // ),
-    //       body: Column(
-    //         children: [
-    //           TabBar(
-    //             tabs: [
-    //               Tab(
-    //                 icon: Icon(
-    //                   Icons.image,
-    //                   color: Colors.pink.shade100,
-    //                 ),
-    //               ),
-    //               Tab(
-    //                 icon: Icon(
-    //                   Icons.music_note,
-    //                   color: Colors.pink.shade100,
-    //                 ),
-    //               ),
-    //               Tab(
-    //                 icon: Icon(
-    //                   Icons.games,
-    //                   color: Colors.pink.shade100,
-    //                 ),
-    //               )
-    //             ],
-    //             indicatorColor: Colors.pink.shade100,
-    //           ),
-    //           const Expanded(
-    //             child: TabBarView(children: [
-    //               MemoriesTab(),
-    //               MusicTab(),
-    //               GamesTab(),
-    //             ]),
-    //           )
-    //         ],
-    //       ),
-    //     ),
-    //   ),
-    // );
-//   }
-// }

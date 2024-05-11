@@ -9,7 +9,7 @@ class MediaPreviewPage extends StatefulWidget {
   final File mediaFile;
   final bool isImage;
 
-  MediaPreviewPage({Key key, @required this.mediaFile, @required this.isImage})
+  MediaPreviewPage({Key? key, required this.mediaFile, required this.isImage})
       : super(key: key);
 
   @override
@@ -161,14 +161,14 @@ class _MediaPreviewPageState extends State<MediaPreviewPage> {
 class VideoPlayerWidget extends StatefulWidget {
   final String url;
 
-  const VideoPlayerWidget({Key key, @required this.url}) : super(key: key);
+  const VideoPlayerWidget({Key? key, required this.url}) : super(key: key);
 
   @override
   _VideoPlayerWidgetState createState() => _VideoPlayerWidgetState();
 }
 
 class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
-  VideoPlayerController _controller;
+  late VideoPlayerController _controller;
 
   @override
   void initState() {

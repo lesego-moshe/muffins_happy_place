@@ -8,8 +8,8 @@ class AnimatedContainerRowWidget extends StatefulWidget {
 
 class _AnimatedContainerRowWidgetState extends State<AnimatedContainerRowWidget>
     with SingleTickerProviderStateMixin {
-  AnimationController _controller;
-  Animation<double> _animation;
+  late AnimationController _controller;
+  late Animation<double> _animation;
   bool _isExpanded = false;
 
   @override

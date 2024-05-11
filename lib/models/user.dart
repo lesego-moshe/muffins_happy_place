@@ -1,11 +1,11 @@
 class CurrentUser {
-  String firstName;
-  String lastName;
-  String userName;
-  List<String> cards;
-  String uid;
-  String bio;
-  String userAvatar;
+  String? firstName;
+  String? lastName;
+  String? userName;
+  List<String>? cards;
+  String? uid;
+  String? bio;
+  String? userAvatar;
 
   CurrentUser(
       {this.firstName,

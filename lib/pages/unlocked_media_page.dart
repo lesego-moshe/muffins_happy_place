@@ -10,12 +10,11 @@ import 'package:liquid_pull_to_refresh/liquid_pull_to_refresh.dart';
 import 'package:video_player/video_player.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:photo_view/photo_view_gallery.dart';
-import 'package:video_player/video_player.dart';
 
 import 'media_preview.dart';
 
 class UnlockedMediaPage extends StatefulWidget {
-  const UnlockedMediaPage({Key key}) : super(key: key);
+  const UnlockedMediaPage({Key? key}) : super(key: key);
 
   @override
   State<UnlockedMediaPage> createState() => _UnlockedMediaPageState();
@@ -29,7 +28,7 @@ class _UnlockedMediaPageState extends State<UnlockedMediaPage> {
   @override
   void initState() {
     super.initState();
-    // Call the function to fetch media data from Firestore when the page loads
+    
     _fetchMedia();
   }
 
@@ -343,75 +342,76 @@ class _UnlockedMediaPageState extends State<UnlockedMediaPage> {
       },
     );
     if (image != null) {
-      await _uploadMediaToFirestore(image, true);
+      await _uploadMediaToFirestore(image!, true);
     }
 
     if (video != null) {
-      await _uploadMediaToFirestore(video, false);
+      await _uploadMediaToFirestore(video!, false);
     }
   }
 
   double progressValue = 0.0;
-  File image;
-  File video;
+  File? image;
+  File? video;
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        iconTheme: IconThemeData(
-          color: Colors.pink.shade100,
-        ),
-        elevation: 0,
-        backgroundColor: Colors.transparent,
-        actions: [
-          GestureDetector(
-            onTap: _uploadMedia,
-            child: Container(
-              width: 100,
-              padding: const EdgeInsets.all(14.0),
-              decoration: BoxDecoration(
-                color: Colors.pink.shade100,
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Center(
-                child: Row(
-                  children: const [
-                    Icon(
-                      CupertinoIcons.photo_on_rectangle,
-                      color: Colors.white,
-                    ),
-                    SizedBox(
-                      width: 5,
-                    ),
-                    Text(
-                      "Upload",
-                      style: TextStyle(
+    return LiquidPullToRefresh(
+      height: 200,
+      color: Colors.pink.shade100,
+      backgroundColor: Colors.pink.shade50,
+      onRefresh: _fetchMedia,
+      child: Scaffold(
+        appBar: AppBar(
+          iconTheme: IconThemeData(
+            color: Colors.pink.shade100,
+          ),
+          elevation: 0,
+          backgroundColor: Colors.transparent,
+          actions: [
+            GestureDetector(
+              onTap: _uploadMedia,
+              child: Container(
+                width: 100,
+                padding: const EdgeInsets.all(14.0),
+                decoration: BoxDecoration(
+                  color: Colors.pink.shade100,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Center(
+                  child: Row(
+                    children: const [
+                      Icon(
+                        CupertinoIcons.photo_on_rectangle,
                         color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
                       ),
-                    ),
-                  ],
+                      SizedBox(
+                        width: 5,
+                      ),
+                      Text(
+                        "Upload",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
-          ),
-        ],
-      ),
-      body: Column(
-        children: [
-          SizedBox(
-            height: 20,
-          ),
+          ],
+        ),
+        body: Column(
+          children: [
+            SizedBox(
+              height: 20,
+            ),
 
-          // Display selected images and videos or "No media"
-          if (imageUrls.isNotEmpty || videoUrls.isNotEmpty)
-            Expanded(
-              child: LiquidPullToRefresh(
-                height: 200,
-                color: Colors.pink.shade100,
-                onRefresh: _fetchMedia,
+            // Display selected images and videos or "No media"
+            if (imageUrls.isNotEmpty || videoUrls.isNotEmpty)
+              Expanded(
                 child: MasonryGridView.builder(
                   gridDelegate:
                       const SliverSimpleGridDelegateWithFixedCrossAxisCount(
@@ -444,23 +444,23 @@ class _UnlockedMediaPageState extends State<UnlockedMediaPage> {
                   },
                 ),
               ),
-            ),
-          if (imageUrls.isEmpty && videoUrls.isEmpty)
-            LiquidPullToRefresh(
-              onRefresh: _fetchMedia,
-              child: const Expanded(
-                child: Center(
-                  child: Text(
-                    'No media',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
+            if (imageUrls.isEmpty && videoUrls.isEmpty)
+              LiquidPullToRefresh(
+                onRefresh: _fetchMedia,
+                child: const Expanded(
+                  child: Center(
+                    child: Text(
+                      'No media',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                 ),
               ),
-            ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -469,20 +469,20 @@ class _UnlockedMediaPageState extends State<UnlockedMediaPage> {
 class VideoPlayerWidget extends StatefulWidget {
   final String url;
 
-  const VideoPlayerWidget({Key key, @required this.url}) : super(key: key);
+  const VideoPlayerWidget({Key? key, required this.url}) : super(key: key);
 
   @override
   _VideoPlayerWidgetState createState() => _VideoPlayerWidgetState();
 }
 
 class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
-  VideoPlayerController _controller;
-  Future<void> _initializeVideoPlayerFuture;
+  late VideoPlayerController _controller;
+  late Future<void> _initializeVideoPlayerFuture;
 
   @override
   void initState() {
     super.initState();
-    _controller = VideoPlayerController.network(widget.url);
+    _controller = VideoPlayerController.networkUrl(widget.url as Uri);
     _initializeVideoPlayerFuture = _controller.initialize();
   }
 

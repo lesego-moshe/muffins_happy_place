@@ -5,17 +5,17 @@ import 'package:flutter_slidable/flutter_slidable.dart';
 class HabitTile extends StatelessWidget {
   final String habitName;
   final bool habitCompleted;
-  final Function(bool) onChanged;
+  final Function(bool?) onChanged;
   final Function(BuildContext) editTapped;
   final Function(BuildContext) deleteTapped;
 
   const HabitTile(
-      {Key key,
-      @required this.habitName,
-      @required this.habitCompleted,
-      @required this.onChanged,
-      @required this.editTapped,
-      @required this.deleteTapped})
+      {Key? key,
+      required this.habitName,
+      required this.habitCompleted,
+      required this.onChanged,
+      required this.editTapped,
+      required this.deleteTapped})
       : super(key: key);
 
   @override

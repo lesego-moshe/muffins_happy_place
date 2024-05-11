@@ -9,7 +9,7 @@ import 'package:muffins_happy_place/pages/period_tracking_page.dart';
 import '../models/event.dart';
 
 class Calendar extends StatefulWidget {
-  const Calendar({Key key}) : super(key: key);
+  const Calendar({Key? key}) : super(key: key);
 
   @override
   State<Calendar> createState() => _CalendarState();
@@ -18,7 +18,7 @@ class Calendar extends StatefulWidget {
 class _CalendarState extends State<Calendar> {
   final _calendarControllerToday = AdvancedCalendarController.today();
   final events = <DateTime>[];
-  Event selectedEvent;
+  late Event selectedEvent;
   String selectedDayEventsMessage = 'Tap a date to see events';
 
   void addEventToFirestore(Event event) {
@@ -28,7 +28,9 @@ class _CalendarState extends State<Calendar> {
   Future<List<Event>> getEventsFromFirestore() async {
     QuerySnapshot querySnapshot =
         await FirebaseFirestore.instance.collection('Events').get();
-    return querySnapshot.docs.map((doc) => Event.fromJson(doc.data())).toList();
+    return querySnapshot.docs
+        .map((doc) => Event.fromJson(doc.data() as Map<String, dynamic>))
+        .toList();
   }
 
   String getDaySuffix(int day) {
@@ -74,15 +76,15 @@ class _CalendarState extends State<Calendar> {
             Theme(
               data: theme.copyWith(
                 textTheme: theme.textTheme.copyWith(
-                  titleMedium: theme.textTheme.titleMedium.copyWith(
+                  titleMedium: theme.textTheme.titleMedium!.copyWith(
                     fontSize: 16,
                     color: theme.colorScheme.secondary,
                   ),
-                  bodyLarge: theme.textTheme.bodyLarge.copyWith(
+                  bodyLarge: theme.textTheme.bodyLarge!.copyWith(
                     fontSize: 14,
                     color: Colors.red,
                   ),
-                  bodyMedium: theme.textTheme.bodyMedium.copyWith(
+                  bodyMedium: theme.textTheme.bodyMedium!.copyWith(
                     fontSize: 20,
                     color: Colors.pink.shade100,
                   ),
@@ -97,7 +99,7 @@ class _CalendarState extends State<Calendar> {
                   showDialog(
                     context: context,
                     builder: (context) {
-                      String eventName;
+                      String? eventName;
                       return AlertDialog(
                         title: const Text('Add Event'),
                         content: TextField(
@@ -121,7 +123,7 @@ class _CalendarState extends State<Calendar> {
                                     date: _calendarControllerToday.value,
                                     name: eventName);
 
-                                events.add(event.date);
+                                events.add(event.date!);
 
                                 addEventToFirestore(event);
                               });
@@ -138,12 +140,13 @@ class _CalendarState extends State<Calendar> {
                   builder: (BuildContext context,
                       AsyncSnapshot<List<Event>> snapshot) {
                     if (snapshot.hasData) {
-                      List<Event> sortedEvents = List.from(snapshot.data)
-                        ..sort((a, b) => a.date.compareTo(b.date));
+                      List<Event>? sortedEvents =
+                          List.from(snapshot.data as Iterable)
+                            ..sort((a, b) => a.date!.compareTo(b.date!));
 
                       Event nextEvent = sortedEvents.firstWhere(
-                          (event) => event.date.isAfter(DateTime.now()),
-                          orElse: () => null);
+                        (event) => event.date!.isAfter(DateTime.now()),
+                      );
 
                       return Column(
                         children: [
@@ -154,8 +157,8 @@ class _CalendarState extends State<Calendar> {
                                 const TextStyle(color: Colors.pinkAccent),
                             innerDot: true,
                             controller: _calendarControllerToday,
-                            events: snapshot.data
-                                .map((event) => event.date)
+                            events: snapshot.data!
+                                .map((event) => event.date!)
                                 .toList(),
                             startWeekDay: 1,
                           ),
@@ -165,7 +168,7 @@ class _CalendarState extends State<Calendar> {
                           nextEvent != null
                               ? Center(
                                   child: Text(
-                                    'Upcoming event: ${nextEvent.name} on the ${nextEvent.date.day}${getDaySuffix(nextEvent.date.day)} of ${DateFormat('MMMM').format(nextEvent.date)} ${nextEvent.date.year}',
+                                    'Upcoming event: ${nextEvent.name} on the ${nextEvent.date!.day}${getDaySuffix(nextEvent.date!.day)} of ${DateFormat('MMMM').format(nextEvent.date!)} ${nextEvent.date!.year}',
                                     style: const TextStyle(
                                         fontSize: 18,
                                         fontWeight: FontWeight.bold,

@@ -5,7 +5,7 @@ import 'package:sizer/sizer.dart';
 class SquareTile extends StatelessWidget {
   final String imagePath;
   final Function() onTap;
-  const SquareTile({@required this.imagePath, @required this.onTap});
+  const SquareTile({required this.imagePath, required this.onTap});
 
   @override
   Widget build(BuildContext context) {

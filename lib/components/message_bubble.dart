@@ -5,13 +5,13 @@ class MessageBubble extends StatefulWidget {
   final String text;
   final bool isSender;
 
-  final Function onLongPress;
+  final Function? onLongPress;
   final Function onTap;
 
   MessageBubble({
-    @required this.text,
-    @required this.isSender,
-    @required this.onTap,
+    required this.text,
+    required this.isSender,
+    required this.onTap,
     this.onLongPress,
   });
 
@@ -57,8 +57,7 @@ class _MessageBubbleState extends State<MessageBubble> {
           child: BubbleSpecialThree(
             isSender: widget.isSender,
             text: widget.text,
-            color:
-                widget.isSender ? Colors.pink.shade100 : Colors.grey.shade200,
+            color: widget.isSender ? Colors.pink.shade100 : Colors.white,
             textStyle: TextStyle(
               color: widget.isSender ? Colors.white : Colors.black,
               fontSize: 16.0,

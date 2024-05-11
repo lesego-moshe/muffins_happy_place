@@ -1,4 +1,3 @@
-import 'package:badges/badges.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -12,7 +11,6 @@ import 'package:settings_ui/settings_ui.dart';
 import 'package:sizer/sizer.dart';
 
 import '../models/user.dart';
-import 'account.dart';
 import 'home_page.dart';
 
 class ProfilePage extends StatefulWidget {
@@ -60,8 +58,8 @@ class _ProfilePageState extends State<ProfilePage> {
               ],
             ));
 
-    if (newValue.trim().length > 0) {
-      await usersCollection.doc(currentUser.email).update({field: newValue});
+    if (newValue.trim().isNotEmpty) {
+      await usersCollection.doc(currentUser!.email).update({field: newValue});
     }
   }
 
@@ -73,11 +71,12 @@ class _ProfilePageState extends State<ProfilePage> {
         body: StreamBuilder<DocumentSnapshot>(
           stream: FirebaseFirestore.instance
               .collection("Users")
-              .doc(FirebaseAuth.instance.currentUser.uid)
+              .doc(FirebaseAuth.instance.currentUser!.uid)
               .snapshots(),
           builder: (context, snapshot) {
             if (snapshot.hasData) {
-              myData = CurrentUser.fromJson(snapshot.data.data());
+              myData = CurrentUser.fromJson(
+                  snapshot.data!.data() as Map<String, dynamic>);
 
               return AnimationLimiter(
                 child: SingleChildScrollView(
@@ -101,13 +100,13 @@ class _ProfilePageState extends State<ProfilePage> {
                             decoration: BoxDecoration(
                                 color: Colors.pink.shade100,
                                 borderRadius: const BorderRadius.all(
-                                    const Radius.circular(20))),
+                                    Radius.circular(20))),
                             child: Padding(
                               padding:
                                   const EdgeInsets.only(bottom: 0.0, top: 0),
                               child: ClipRRect(
-                                borderRadius: const BorderRadius.all(
-                                    const Radius.circular(20)),
+                                borderRadius:
+                                    const BorderRadius.all(Radius.circular(20)),
                                 child: TextButton(
                                   onPressed: () {
                                     //                                       isfromProfiletrepData = true;
@@ -138,7 +137,8 @@ class _ProfilePageState extends State<ProfilePage> {
                                           child: ClipOval(
                                             child: myData.userAvatar != ''
                                                 ? CachedNetworkImage(
-                                                    imageUrl: myData.userAvatar,
+                                                    imageUrl:
+                                                        myData.userAvatar!,
                                                     fit: BoxFit.cover,
                                                   )
                                                 : Center(
@@ -146,7 +146,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                                       type: MaterialType
                                                           .transparency,
                                                       child: Text(
-                                                        myData.firstName[0]
+                                                        myData.firstName![0]
                                                             .toUpperCase(),
                                                         style: const TextStyle(
                                                             color: Colors
@@ -174,7 +174,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                               child: Row(
                                                 children: [
                                                   Text(
-                                                    myData.firstName,
+                                                    myData.firstName!,
                                                     style: const TextStyle(
                                                         fontWeight:
                                                             FontWeight.bold,
@@ -192,12 +192,13 @@ class _ProfilePageState extends State<ProfilePage> {
                                                       showModalBottomSheet(
                                                           context: context,
                                                           shape:
-                                                              RoundedRectangleBorder(
+                                                              const RoundedRectangleBorder(
                                                             borderRadius:
-                                                                BorderRadius.vertical(
-                                                                    top: Radius
-                                                                        .circular(
-                                                                            10)),
+                                                                BorderRadius
+                                                                    .vertical(
+                                                              top: Radius
+                                                                  .circular(10),
+                                                            ),
                                                           ),
                                                           builder: (BuildContext
                                                               context) {
@@ -205,9 +206,10 @@ class _ProfilePageState extends State<ProfilePage> {
                                                               child: Column(
                                                                 children: [
                                                                   Padding(
-                                                                    padding: const EdgeInsets
+                                                                    padding:
+                                                                        const EdgeInsets
                                                                             .all(
-                                                                        12.0),
+                                                                            12.0),
                                                                     child: Text(
                                                                       "Yay! You are someone important🩷",
                                                                       style:
@@ -224,7 +226,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                                                       ),
                                                                     ),
                                                                   ),
-                                                                  SizedBox(
+                                                                  const SizedBox(
                                                                     height: 20,
                                                                   ),
                                                                   Lottie.asset(
@@ -235,7 +237,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                                                           false
                                                                       // animate: false,
                                                                       ),
-                                                                  SizedBox(
+                                                                  const SizedBox(
                                                                     height: 20,
                                                                   ),
                                                                   Text(
@@ -266,17 +268,16 @@ class _ProfilePageState extends State<ProfilePage> {
                                                           });
                                                     },
                                                     child: Visibility(
-                                                      visible: myData
-                                                                  .firstName ==
-                                                              'Lesego' ||
-                                                          myData.firstName ==
-                                                              'Tisetso',
-                                                      child: Lottie.asset(
-                                                        'lib/images/pink.json',
-                                                        height: 20,
-                                                        animate: true,
-                                                      ),
-                                                    ),
+                                                        visible: myData
+                                                                    .firstName ==
+                                                                'Lesego' ||
+                                                            myData.firstName ==
+                                                                'Tisetso',
+                                                        child: Icon(
+                                                          Icons.verified,
+                                                          color:
+                                                              Colors.pinkAccent,
+                                                        )),
                                                   )
                                                 ],
                                               ),
@@ -286,8 +287,8 @@ class _ProfilePageState extends State<ProfilePage> {
                                               constraints: BoxConstraints(
                                                   maxWidth: 40.w),
                                               child: Text(
-                                                FirebaseAuth
-                                                    .instance.currentUser.email,
+                                                FirebaseAuth.instance
+                                                    .currentUser!.email!,
                                                 style: const TextStyle(
                                                     color: Colors.white70),
                                                 softWrap: false,
@@ -350,15 +351,15 @@ class _ProfilePageState extends State<ProfilePage> {
                                     Navigator.push(
                                         context,
                                         PageTransition(
-                                            childCurrent: ProfilePage(),
+                                            childCurrent: const ProfilePage(),
                                             ctx: context,
                                             type: PageTransitionType
                                                 .rightToLeftJoined,
-                                            child: Calendar(),
+                                            child: const Calendar(),
                                             curve:
                                                 Curves.easeInOutCubicEmphasized,
-                                            duration:
-                                                Duration(milliseconds: 900)));
+                                            duration: const Duration(
+                                                milliseconds: 900)));
                                   },
                                   leading: Icon(
                                     CupertinoIcons.calendar,
@@ -380,38 +381,34 @@ class _ProfilePageState extends State<ProfilePage> {
                                       builder: (BuildContext context) {
                                         // return object of type Dialog
                                         return AlertDialog(
-                                          title: new Text(
+                                          title: const Text(
                                             "Logout",
-                                            style: const TextStyle(
+                                            style: TextStyle(
                                               fontWeight: FontWeight.bold,
                                             ),
                                           ),
-                                          content: new Text(
+                                          content: Text(
                                               "Are you sure you wish to logout? You'll have to manually sign in next time.",
                                               style:
                                                   TextStyle(fontSize: 3.5.w)),
                                           actions: <Widget>[
                                             // usually buttons at the bottom of the dialog
-                                            new FlatButton(
+                                            new ElevatedButton(
                                               child: new Text("Close"),
                                               onPressed: () {
                                                 Navigator.of(context).pop();
                                               },
                                             ),
-                                            new FlatButton(
+                                            new ElevatedButton(
                                               child: new Text(
                                                 "Yes, I'm sure",
-                                                style: TextStyle(
+                                                style: const TextStyle(
                                                     color: Colors.red),
                                               ),
                                               onPressed: () async {
                                                 Navigator.of(context).pop();
                                                 await FirebaseAuth.instance
                                                     .signOut();
-                                                // FirebaseFirestore.instance.collection("Users").doc(userType==3? trepData.uid:trepData.uid).update({
-                                                //   'token':FieldValue.arrayUnion([])
-                                                // });
-                                                //wasLoggenIn=true;
                                               },
                                             ),
                                           ],
@@ -488,31 +485,30 @@ class _ProfilePageState extends State<ProfilePage> {
                         ),
                         RichText(
                           text: TextSpan(
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .subtitle1
-                                  .copyWith(
-                                      color: Colors.black.withOpacity(0.5)),
-                              children: <TextSpan>[
-                                const TextSpan(text: 'Made with love by '),
-                                TextSpan(
-                                  text: 'LESEGO MOSHE',
-                                  style: TextStyle(
-                                      fontFamily: "SF-Bold",
-                                      fontSize: 4.1.w,
-                                      fontWeight: FontWeight.w900,
-                                      color: Colors.pink.shade100),
-                                ),
-                                TextSpan(
-                                  text: ".",
-                                  style: TextStyle(
+                            style: Theme.of(context).textTheme.titleMedium
+                            // .copyWith(color: Colors.black.withOpacity(0.5)),
+                            ,
+                            children: <TextSpan>[
+                              const TextSpan(text: 'Made with love by '),
+                              TextSpan(
+                                text: 'LESEGO MOSHE',
+                                style: TextStyle(
                                     fontFamily: "SF-Bold",
-                                    fontSize: 4.6.w,
+                                    fontSize: 4.1.w,
                                     fontWeight: FontWeight.w900,
-                                    color: Colors.red.shade300,
-                                  ),
+                                    color: Colors.pink.shade100),
+                              ),
+                              TextSpan(
+                                text: ".",
+                                style: TextStyle(
+                                  fontFamily: "SF-Bold",
+                                  fontSize: 4.6.w,
+                                  fontWeight: FontWeight.w900,
+                                  color: Colors.red.shade300,
                                 ),
-                              ]),
+                              ),
+                            ],
+                          ),
                         ),
 
                         const SizedBox(
@@ -544,8 +540,8 @@ class _ProfilePageState extends State<ProfilePage> {
 
 class IconWidget extends StatefulWidget {
   IconWidget({this.icon, this.color});
-  final IconData icon;
-  final Color color;
+  final IconData? icon;
+  final Color? color;
   @override
   _IconWidgetState createState() => _IconWidgetState();
 }

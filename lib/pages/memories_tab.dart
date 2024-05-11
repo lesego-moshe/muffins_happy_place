@@ -6,7 +6,7 @@ import 'package:muffins_happy_place/services/authentication.dart';
 import 'unlocked_media_page.dart';
 
 class MemoriesTab extends StatefulWidget {
-  const MemoriesTab({Key key}) : super(key: key);
+  const MemoriesTab({Key? key}) : super(key: key);
 
   @override
   State<MemoriesTab> createState() => _MemoriesTabState();
@@ -38,9 +38,11 @@ class _MemoriesTabState extends State<MemoriesTab> {
                   bool auth = await Authentication.authentication();
                   if (auth) {
                     Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const UnlockedMediaPage()));
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => UnlockedMediaPage(),
+                      ),
+                    );
                   }
                 },
                 text: "Entice me!")

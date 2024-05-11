@@ -34,7 +34,7 @@ class WeatherService {
     List<Placemark> placemarks =
         await placemarkFromCoordinates(position.latitude, position.longitude);
 
-    String city = placemarks[0].subLocality;
+    String? city = placemarks[0].subLocality;
 
     return city ?? "";
   }

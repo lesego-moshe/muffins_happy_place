@@ -1,18 +1,34 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/material.dart';
 
 enum MessageType { text, image, video, audio, document }
 
 class Message {
   final String senderId;
-  final String content;
+  final String receiverId;
   final MessageType type;
+  final String content;
   final Timestamp timestamp;
+  List<Message>? subMessages;
+  bool? isSubMessage;
 
-  Message({
-    @required this.senderId,
-    @required this.content,
-    @required this.type,
-    @required this.timestamp,
-  });
+  Message(
+      {required this.senderId,
+      required this.receiverId,
+      required this.content,
+      required this.type,
+      required this.timestamp,
+      this.subMessages,
+      this.isSubMessage});
+
+  Map<String, dynamic> toJson() {
+    return {
+      'senderId': senderId,
+      'receiverId': receiverId,
+      'content': content,
+      'type': type,
+      'timestamp': timestamp,
+      'subMessages': subMessages,
+      'isSubMessage': isSubMessage
+    };
+  }
 }

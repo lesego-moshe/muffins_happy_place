@@ -6,13 +6,11 @@ import 'package:sizer/sizer.dart';
 
 import '../components/my_button.dart';
 import '../components/my_textfield.dart';
-import '../components/square_tile.dart';
-import '../services/auth_services.dart';
 import 'forgot_pw_page.dart';
 
 class LoginPage extends StatefulWidget {
   final Function() onTap;
-  const LoginPage({@required this.onTap});
+  const LoginPage({required this.onTap});
 
   @override
   State<LoginPage> createState() => _LoginPageState();

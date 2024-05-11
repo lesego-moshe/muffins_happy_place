@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 
 class GamesTab extends StatefulWidget {
-  const GamesTab({Key key}) : super(key: key);
+  const GamesTab({Key? key}) : super(key: key);
 
   @override
   State<GamesTab> createState() => _GamesTabState();

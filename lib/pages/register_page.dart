@@ -7,12 +7,10 @@ import 'package:sizer/sizer.dart';
 
 import '../components/my_button.dart';
 import '../components/my_textfield.dart';
-import '../components/square_tile.dart';
-import '../services/auth_services.dart';
 
 class RegisterPage extends StatefulWidget {
   final Function() onTap;
-  const RegisterPage({@required this.onTap});
+  const RegisterPage({required this.onTap});
 
   @override
   State<RegisterPage> createState() => _RegisterPageState();
@@ -59,13 +57,13 @@ class _RegisterPageState extends State<RegisterPage> {
 
         await FirebaseFirestore.instance
             .collection("Users")
-            .doc(FirebaseAuth.instance.currentUser.uid)
+            .doc(FirebaseAuth.instance.currentUser!.uid)
             .set({
           'userName': emailController.text.split('@')[0],
           'bio': 'Empty bio',
           'firstName': firstNameController.text,
           'lastName': lastNameController.text,
-          'uid': FirebaseAuth.instance.currentUser.uid,
+          'uid': FirebaseAuth.instance.currentUser!.uid,
           'cards': FieldValue.arrayUnion([]),
           'userAvatar': ''
         });
@@ -240,7 +238,7 @@ class _RegisterPageState extends State<RegisterPage> {
                           child: Text(
                             "Sign in",
                             style: TextStyle(
-                              color: Colors.blue[700],
+                              color: Colors.pinkAccent,
                             ),
                           ),
                         )

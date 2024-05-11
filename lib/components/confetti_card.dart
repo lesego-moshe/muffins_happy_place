@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 
 class ConfettiCard extends StatefulWidget {
-  const ConfettiCard({Key key}) : super(key: key);
+  const ConfettiCard({Key? key}) : super(key: key);
 
   @override
   State<ConfettiCard> createState() => _ConfettiCardState();

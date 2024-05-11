@@ -7,9 +7,9 @@ class MyTextField extends StatelessWidget {
   final bool obscureText;
 
   const MyTextField({
-    @required this.controller,
-    @required this.hintText,
-    @required this.obscureText,
+    required this.controller,
+    required this.hintText,
+    required this.obscureText,
   });
 
   @override

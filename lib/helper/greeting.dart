@@ -21,7 +21,7 @@ class GreetingWidget extends StatefulWidget {
 class _GreetingWidgetState extends State<GreetingWidget>
     with WidgetsBindingObserver {
   String greeting = '';
-  Timer timer;
+  late Timer timer;
 
   @override
   void initState() {

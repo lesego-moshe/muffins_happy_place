@@ -3,11 +3,14 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
+import 'package:muffins_happy_place/models/message.dart';
+import 'package:muffins_happy_place/services/notification_service.dart';
+import 'package:sizer/sizer.dart';
 
 import 'conversation.dart';
 
 class ChatPage extends StatefulWidget {
-  const ChatPage({Key key}) : super(key: key);
+  const ChatPage({Key? key}) : super(key: key);
 
   @override
   State<ChatPage> createState() => _ChatPageState();
@@ -16,6 +19,7 @@ class ChatPage extends StatefulWidget {
 class _ChatPageState extends State<ChatPage> {
   final FirebaseAuth auth = FirebaseAuth.instance;
   List<Map<String, dynamic>> users = [];
+  NotificationService notificationService = NotificationService();
 
   Future<List<Map<String, dynamic>>> fetchUserData() async {
     List<Map<String, dynamic>> userData = [];
@@ -25,9 +29,8 @@ class _ChatPageState extends State<ChatPage> {
         await FirebaseFirestore.instance.collection('Users').get();
 
     snapshot.docs.forEach((doc) {
-      // Exclude the current user by comparing user IDs
-      if (doc.id != currentUser.uid) {
-        userData.add(doc.data());
+      if (doc.id != currentUser!.uid) {
+        userData.add(doc.data() as Map<String, dynamic>);
       }
     });
 
@@ -38,6 +41,9 @@ class _ChatPageState extends State<ChatPage> {
   void initState() {
     super.initState();
     fetchAndSetUsers();
+    notificationService.requestPermission();
+    notificationService.getToken();
+    notificationService.initInfo();
   }
 
   Future<void> fetchAndSetUsers() async {
@@ -75,11 +81,13 @@ class _ChatPageState extends State<ChatPage> {
 
                 return GestureDetector(
                   onTap: () {
-                    // Navigate to the conversation page when tapped
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => ConversationPage(user: user),
+                        builder: (context) => ConversationPage(
+                          user: user,
+                          onSwipedMessage: (Message value) {},
+                        ),
                       ),
                     );
                   },
@@ -89,13 +97,13 @@ class _ChatPageState extends State<ChatPage> {
                           ? CachedNetworkImage(
                               imageUrl: avatarUrl,
                               fit: BoxFit.cover,
-                              width: 50, // Adjust the size as needed
+                              width: 50,
                               height: 50,
                               placeholder: (context, url) => const Center(
                                 child: CircularProgressIndicator(),
                               ),
                               errorWidget: (context, url, error) => const Icon(
-                                Icons.error, // Placeholder when an error occurs
+                                Icons.error, //
                               ),
                             )
                           : Container(
@@ -118,17 +126,30 @@ class _ChatPageState extends State<ChatPage> {
                     ),
                     title: Row(
                       children: [
-                        Text(
-                          user['userName'].toString(),
-                          style: const TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                        const SizedBox(
-                          width: 5,
-                        ),
-                        Lottie.asset(
-                          'lib/images/pink.json',
-                          animate: true,
-                          height: 20,
+                        RichText(
+                          text: TextSpan(
+                            style: DefaultTextStyle.of(context).style,
+                            children: <InlineSpan>[
+                              TextSpan(
+                                text: user['userName'],
+                                style: TextStyle(
+                                    fontSize: 3.w,
+                                    fontFamily: 'SF-Bold',
+                                    fontWeight: FontWeight.w500),
+                              ),
+                              const WidgetSpan(
+                                  child: SizedBox(
+                                width: 5,
+                              )),
+                              const WidgetSpan(
+                                child: Icon(
+                                  Icons.verified,
+                                  size: 16,
+                                  color: Colors.pinkAccent,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ],
                     ),
