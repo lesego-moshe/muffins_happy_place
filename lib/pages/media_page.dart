@@ -113,7 +113,7 @@ class _MediaPageState extends State<MediaPage> with TickerProviderStateMixin {
 
 class CircleTabIndicator extends Decoration {
   final Color color;
-  double radius;
+  final double radius;
 
   CircleTabIndicator({required this.color, required this.radius});
 

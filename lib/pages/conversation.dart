@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:lottie/lottie.dart';
+import 'package:muffins_happy_place/pages/call_page.dart';
 import 'package:muffins_happy_place/services/chat_service.dart';
 import 'package:muffins_happy_place/services/notification_service.dart';
 import 'package:path_provider/path_provider.dart';
@@ -121,7 +122,9 @@ class _ConversationPageState extends State<ConversationPage> {
                       child: const Text('Video Call'),
                       onPressed: () {
                         Navigator.pop(context);
-                        // Add your logic for 'Option 1' here
+                        Navigator.of(context).push(MaterialPageRoute(
+                            builder: (context) => CallPage()));
+                        ;
                       },
                     ),
                     CupertinoActionSheetAction(
@@ -192,6 +195,7 @@ class _ConversationPageState extends State<ConversationPage> {
 
   Widget _buildMessageList() {
     String senderId = currentUser!.uid;
+    int? lastMessageHour;
     List<DateTime> hourMarkers = [];
     return StreamBuilder<QuerySnapshot>(
       stream: _chatService.getMessages(senderId, widget.user['uid']),
@@ -212,11 +216,14 @@ class _ConversationPageState extends State<ConversationPage> {
             final doc = snapshot.data!.docs[index];
             final data = doc.data() as Map<String, dynamic>;
             final currentDate = data['timestamp'].toDate();
-            final showDateChip = shouldShowDateChip(currentDate, hourMarkers);
+            final showDateChip =
+                shouldShowDateChip(currentDate, lastMessageHour);
 
             if (showDateChip) {
               hourMarkers.add(currentDate);
             }
+
+            lastMessageHour = currentDate.hour;
 
             return Column(
               children: [
@@ -234,15 +241,17 @@ class _ConversationPageState extends State<ConversationPage> {
     );
   }
 
-  bool shouldShowDateChip(DateTime currentDate, List<DateTime> hourMarkers) {
-    for (DateTime hourMarker in hourMarkers) {
-      if (currentDate.hour == hourMarker.hour) {
-        if (currentDate.minute >= hourMarker.minute) {
-          return false;
-        }
-      }
+  bool shouldShowDateChip(DateTime currentDate, int? lastMessageHour) {
+    if (lastMessageHour == null) {
+      return true;
     }
-    return true;
+    return currentDate.hour != lastMessageHour;
+  }
+
+  bool isSameDay(DateTime date1, DateTime date2) {
+    return date1.year == date2.year &&
+        date1.month == date2.month &&
+        date1.day == date2.day;
   }
 
   Widget _buildMessageItem(Map<String, dynamic> data) {
@@ -326,7 +335,10 @@ class _ConversationPageState extends State<ConversationPage> {
                   onPressed: () {
                     Navigator.pop(context);
                   },
-                  child: const Text('Cancel'),
+                  child: Text(
+                    'Cancel',
+                    style: TextStyle(color: Colors.red),
+                  ),
                 ),
               ),
             );
@@ -343,11 +355,12 @@ class _ConversationPageState extends State<ConversationPage> {
             controller: messageController,
             decoration: InputDecoration(
               suffixIcon: IconButton(
-                  onPressed: () {},
-                  icon: Icon(
-                    CupertinoIcons.waveform,
-                    color: Colors.pink.shade100,
-                  )),
+                onPressed: () {},
+                icon: Icon(
+                  CupertinoIcons.waveform,
+                  color: Colors.pink.shade100,
+                ),
+              ),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(500),
                 borderSide: const BorderSide(color: Colors.grey),
