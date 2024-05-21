@@ -390,6 +390,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.3.1"
+  flutter_callkit_incoming:
+    dependency: "direct main"
+    description:
+      name: flutter_callkit_incoming
+      sha256: "911978c1db30d2cf886daf80c874ac0beac8482682769b397c0dc3190f3f6cef"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.0.4+1"
   flutter_heatmap_calendar:
     dependency: "direct main"
     description:

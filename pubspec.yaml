@@ -80,6 +80,7 @@ dependencies:
   flutter_webrtc: ^0.10.6
   socket_io_client: ^2.0.3+1
   flutter_in_app_pip: ^1.7.3
+  flutter_callkit_incoming: ^2.0.4+1
 
 dev_dependencies:
   flutter_test:
