@@ -2,14 +2,15 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:lottie/lottie.dart';
 import 'package:muffins_happy_place/pages/call_page.dart';
 import 'package:muffins_happy_place/services/chat_service.dart';
 import 'package:muffins_happy_place/services/notification_service.dart';
-import 'package:muffins_happy_place/services/signaling_service.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:sizer/sizer.dart';
+import 'package:swipe_to/swipe_to.dart';
+
 import '../components/date_chip.dart';
 import '../components/message_bubble.dart';
 import '../models/message.dart';
@@ -37,9 +38,6 @@ class _ConversationPageState extends State<ConversationPage> {
   ChatService _chatService = ChatService();
   final ScrollController _scrollController = ScrollController();
   NotificationService _notificationService = NotificationService();
-  Signaling signaling = Signaling();
-  RTCVideoRenderer _localRenderer = RTCVideoRenderer();
-  RTCVideoRenderer _remoteRenderer = RTCVideoRenderer();
 
   void scrollDown() {
     _scrollController.animateTo(_scrollController.position.maxScrollExtent,
@@ -47,7 +45,7 @@ class _ConversationPageState extends State<ConversationPage> {
   }
 
   void sendMessage(String senderId, String receiverId, String content,
-      MessageKind type) async {
+      MessageType type) async {
     final message = Message(
       senderId: senderId,
       receiverId: widget.user['uid'],
@@ -73,25 +71,9 @@ class _ConversationPageState extends State<ConversationPage> {
     });
   }
 
-  void navigateToCallPage(
-      BuildContext context, RTCVideoRenderer remoteRenderer) async {
-    Signaling signaling = Signaling();
-    String roomId = await signaling.createRoom(remoteRenderer);
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => CallPage(
-          roomId: roomId,
-          remoteRenderer: _remoteRenderer,
-        ),
-      ),
-    );
-  }
-
   @override
   void initState() {
     super.initState();
-    _localRenderer.initialize();
-    _remoteRenderer.initialize();
     _notificationService.initInfo();
     focusNode.addListener(() {
       if (focusNode.hasFocus) {
@@ -138,17 +120,11 @@ class _ConversationPageState extends State<ConversationPage> {
                   actions: <Widget>[
                     CupertinoActionSheetAction(
                       child: const Text('Video Call'),
-                      onPressed: () async {
+                      onPressed: () {
                         Navigator.pop(context);
-                        String roomId =
-                            await signaling.createRoom(_remoteRenderer);
-                        Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (context) => CallPage(
-                                roomId: roomId,
-                                remoteRenderer: _remoteRenderer),
-                          ),
-                        );
+                        Navigator.of(context).push(MaterialPageRoute(
+                            builder: (context) => CallPage()));
+                        ;
                       },
                     ),
                     CupertinoActionSheetAction(
@@ -231,11 +207,6 @@ class _ConversationPageState extends State<ConversationPage> {
         }
         if (snapshot.hasError) {
           return Center(child: Text('Error: ${snapshot.error}'));
-        }
-        if (!snapshot.hasData) {
-          return Center(
-            child: Lottie.asset('lib/images/empty.json'),
-          );
         }
 
         return ListView.builder(
@@ -414,7 +385,7 @@ class _ConversationPageState extends State<ConversationPage> {
                 currentUser!.uid,
                 widget.user['uid'],
                 newMessage,
-                MessageKind.text,
+                MessageType.text,
               );
               DocumentSnapshot currentUserTokenDoc = await FirebaseFirestore
                   .instance

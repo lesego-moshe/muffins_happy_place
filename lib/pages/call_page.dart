@@ -5,10 +5,7 @@ import 'package:flutter_webrtc/flutter_webrtc.dart';
 import '../services/signaling_service.dart';
 
 class CallPage extends StatefulWidget {
-  final String roomId;
-  final RTCVideoRenderer remoteRenderer;
-  const CallPage({Key? key, required this.roomId, required this.remoteRenderer})
-      : super(key: key);
+  const CallPage({Key? key}) : super(key: key);
 
   @override
   State<CallPage> createState() => _CallPageState();
@@ -17,28 +14,26 @@ class CallPage extends StatefulWidget {
 class _CallPageState extends State<CallPage> {
   Signaling signaling = Signaling();
   RTCVideoRenderer _localRenderer = RTCVideoRenderer();
-  // RTCVideoRenderer _remoteRenderer = RTCVideoRenderer();
-
+  RTCVideoRenderer _remoteRenderer = RTCVideoRenderer();
+  String? roomId;
   TextEditingController textEditingController = TextEditingController(text: '');
 
   @override
   void initState() {
     _localRenderer.initialize();
-    widget.remoteRenderer.initialize();
+    _remoteRenderer.initialize();
 
     signaling.onAddRemoteStream = ((stream) {
-      widget.remoteRenderer.srcObject = stream;
+      _remoteRenderer.srcObject = stream;
       setState(() {});
     });
-
-    print('...............Room ID: ${widget.roomId}');
     super.initState();
   }
 
   @override
   void dispose() {
     _localRenderer.dispose();
-    widget.remoteRenderer.dispose();
+    _remoteRenderer.dispose();
     textEditingController.dispose();
     super.dispose();
   }
@@ -50,7 +45,7 @@ class _CallPageState extends State<CallPage> {
           whileNotInPip: Stack(
             children: [
               Positioned.fill(
-                child: RTCVideoView(widget.remoteRenderer, mirror: true),
+                child: RTCVideoView(_remoteRenderer, mirror: true),
               ),
               Positioned(
                 bottom: 8.0,
@@ -64,7 +59,7 @@ class _CallPageState extends State<CallPage> {
           whileInPip: Stack(
             children: [
               Positioned.fill(
-                child: RTCVideoView(widget.remoteRenderer, mirror: true),
+                child: RTCVideoView(_remoteRenderer, mirror: true),
               ),
               Positioned(
                 bottom: 8.0,
@@ -102,16 +97,15 @@ class _CallPageState extends State<CallPage> {
                 children: [
                   ElevatedButton(
                     onPressed: () {
-                      signaling.openUserMedia(
-                          _localRenderer, widget.remoteRenderer);
+                      signaling.openUserMedia(_localRenderer, _remoteRenderer);
                     },
                     child: Text("Open camera and microphone"),
                   ),
                   SizedBox(width: 8),
                   ElevatedButton(
                     onPressed: () async {
-                      // roomId = await signaling.createRoom(_remoteRenderer);
-                      // textEditingController.text = roomId!;
+                      roomId = await signaling.createRoom(_remoteRenderer);
+                      textEditingController.text = roomId!;
                     },
                     child: Text("Create room"),
                   ),
@@ -130,7 +124,7 @@ class _CallPageState extends State<CallPage> {
               child: Stack(
                 children: [
                   Positioned.fill(
-                    child: RTCVideoView(widget.remoteRenderer, mirror: true),
+                    child: RTCVideoView(_remoteRenderer, mirror: true),
                   ),
                   Positioned(
                     bottom: 8.0,

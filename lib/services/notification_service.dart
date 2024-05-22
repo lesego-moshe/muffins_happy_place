@@ -4,11 +4,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter_callkit_incoming/entities/call_kit_params.dart';
-import 'package:flutter_callkit_incoming/flutter_callkit_incoming.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:http/http.dart' as http;
-import 'package:muffins_happy_place/constants.dart';
 
 class NotificationService {
   final currentUser = FirebaseAuth.instance.currentUser;
@@ -114,7 +111,8 @@ class NotificationService {
       await http.post(Uri.parse('https://fcm.googleapis.com/fcm/send'),
           headers: <String, String>{
             'Content-Type': 'application/json',
-            'Authorization': 'key=$serverKey',
+            'Authorization':
+                'key=AAAApIU_SPg:APA91bEqFq2uykBgPzzjSSvazgyIpVGsQFnItf3NdT_2fjbJ_3eKPxcph6pFmov9vEBRbLI2zOir9X11gXgYqvl44_le_TU7t7S5g0zE64rM33bqyjp60tWONYd7WvqqHvNbl69tJ1FC',
           },
           body: jsonEncode(
             <String, dynamic>{
@@ -138,67 +136,5 @@ class NotificationService {
         print(e.toString());
       }
     }
-  }
-
-  void sendVideoCallNotification(
-      String token, String roomId, String callerName) async {
-    try {
-      await http.post(Uri.parse('https://fcm.googleapis.com/fcm/send'),
-          headers: <String, String>{
-            'Content-Type': 'application/json',
-            'Authorization': 'key=$serverKey',
-          },
-          body: jsonEncode(
-            <String, dynamic>{
-              'priority': 'high',
-              'data': <String, dynamic>{
-                'click_action': 'FLUTTER_NOTIFICATION_CLICK',
-                'room_id': roomId,
-                'caller_name': callerName,
-                'type': 'video_call',
-              },
-              "notification": <String, dynamic>{
-                "title": "Incoming Video Call",
-                "body": "$callerName is calling you",
-                "android_channel_id": "muffinshappyplace"
-              },
-              "to": token,
-            },
-          ));
-    } catch (e) {
-      if (kDebugMode) {
-        print(e.toString());
-      }
-    }
-  }
-
-  Future<void> showIncomingCall(
-      String uuid, String handle, String callerName) async {
-    final params = <String, dynamic>{
-      'id': uuid,
-      'nameCaller': callerName,
-      'handle': handle,
-      'type': 0,
-      'duration': 30000,
-      'textAccept': 'Accept',
-      'textDecline': 'Decline',
-      'textMissedCall': 'Missed call',
-      'textCallback': 'Call back',
-      'extra': <String, dynamic>{'userId': handle},
-      'headers': <String, dynamic>{'apiKey': 'Abc@123!'},
-      'android': <String, dynamic>{
-        'isCustomNotification': true,
-        'isShowLogo': false,
-        'isShowCallback': true,
-        'ringtonePath': 'system_ringtone_default',
-      },
-      'ios': <String, dynamic>{
-        'iconName': 'CallKitLogo',
-        'handleType': 'generic',
-        'supportsVideo': true,
-      },
-    };
-
-    await FlutterCallkitIncoming.showCallkitIncoming(params as CallKitParams);
   }
 }

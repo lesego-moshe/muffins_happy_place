@@ -7,7 +7,7 @@ class ChatService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
   Future<void> sendMessage(String senderId, String receiverId, String content,
-      MessageKind type) async {
+      MessageType type) async {
     final String currentUserId = _auth.currentUser!.uid;
 
     Message newMessage = Message(
