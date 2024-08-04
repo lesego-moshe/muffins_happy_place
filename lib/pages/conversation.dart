@@ -2,11 +2,13 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:lottie/lottie.dart';
 import 'package:muffins_happy_place/pages/call_page.dart';
 import 'package:muffins_happy_place/services/chat_service.dart';
 import 'package:muffins_happy_place/services/notification_service.dart';
+import 'package:muffins_happy_place/services/signaling_service.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sizer/sizer.dart';
 import 'package:swipe_to/swipe_to.dart';
@@ -38,6 +40,10 @@ class _ConversationPageState extends State<ConversationPage> {
   ChatService _chatService = ChatService();
   final ScrollController _scrollController = ScrollController();
   NotificationService _notificationService = NotificationService();
+  Signaling signaling = Signaling();
+  RTCVideoRenderer remoteRenderer = RTCVideoRenderer();
+  RTCVideoRenderer localRenderer = RTCVideoRenderer();
+  bool isCalling = false;
 
   void scrollDown() {
     _scrollController.animateTo(_scrollController.position.maxScrollExtent,
@@ -45,7 +51,7 @@ class _ConversationPageState extends State<ConversationPage> {
   }
 
   void sendMessage(String senderId, String receiverId, String content,
-      MessageType type) async {
+      MessageKind type) async {
     final message = Message(
       senderId: senderId,
       receiverId: widget.user['uid'],
@@ -71,9 +77,41 @@ class _ConversationPageState extends State<ConversationPage> {
     });
   }
 
+  Future<void> initiateVideoCall(String roomId) async {
+    setState(() {
+      isCalling = true;
+    });
+
+    String callerName = currentUser!.displayName ?? 'Unknown Caller';
+
+    // Fetch receiver's FCM token
+    DocumentSnapshot userDoc =
+        await _firestore.collection("UserTokens").doc(widget.user['uid']).get();
+    String receiverToken = userDoc['token'];
+
+    // Send video call notification
+    _notificationService.sendVideoCallNotification(
+        receiverToken, roomId, callerName);
+
+    // Navigate to the video call screen
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => CallPage(
+          roomId: roomId,
+        ),
+      ),
+    );
+  }
+
   @override
   void initState() {
     super.initState();
+    remoteRenderer.initialize();
+    signaling.onAddRemoteStream = ((stream) {
+      remoteRenderer.srcObject = stream;
+      setState(() {});
+    });
     _notificationService.initInfo();
     focusNode.addListener(() {
       if (focusNode.hasFocus) {
@@ -116,15 +154,60 @@ class _ConversationPageState extends State<ConversationPage> {
             onPressed: () {
               showCupertinoModalPopup(
                 context: context,
-                builder: (BuildContext context) => CupertinoActionSheet(
+                builder: (BuildContext dialogContext) => CupertinoActionSheet(
                   actions: <Widget>[
                     CupertinoActionSheetAction(
                       child: const Text('Video Call'),
-                      onPressed: () {
-                        Navigator.pop(context);
-                        Navigator.of(context).push(MaterialPageRoute(
-                            builder: (context) => CallPage()));
-                        ;
+                      onPressed: () async {
+                        Navigator.pop(dialogContext);
+                        showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              content: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  CircularProgressIndicator(),
+                                  SizedBox(height: 16),
+                                  Text('Setting up video call...'),
+                                ],
+                              ),
+                            );
+                          },
+                        );
+
+                        try {
+                          Navigator.pop(context); // Dismiss the loading dialog
+                          String roomId =
+                              await signaling.createRoom(remoteRenderer);
+
+                          initiateVideoCall(roomId);
+                        } catch (e) {
+                          // Handle any errors that might occur during navigation
+                          print("Error during navigation: $e");
+                          // Optionally, show an error message to the user
+                          // You can also dismiss the loading dialog here if an error occurs
+                          Navigator.pop(context); // Dismiss the loading dialog
+                          showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return AlertDialog(
+                                title: Text('Error'),
+                                content: Text(
+                                    'Failed to set up video call. Please try again.'),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () {
+                                      Navigator.pop(
+                                          context); // Dismiss the error dialog
+                                    },
+                                    child: Text('OK'),
+                                  ),
+                                ],
+                              );
+                            },
+                          );
+                        }
                       },
                     ),
                     CupertinoActionSheetAction(
@@ -134,7 +217,6 @@ class _ConversationPageState extends State<ConversationPage> {
                         // Add your logic for 'Option 2' here
                       },
                     ),
-                    // Add more options here
                   ],
                   cancelButton: CupertinoActionSheetAction(
                     isDefaultAction: true,
@@ -153,7 +235,9 @@ class _ConversationPageState extends State<ConversationPage> {
         children: [
           Expanded(child: _buildMessageList()),
           Container(
-              padding: const EdgeInsets.all(10), child: _buildUserInput()),
+            padding: const EdgeInsets.all(10),
+            child: isCalling ? _buildCallingText() : _buildUserInput(),
+          ),
         ],
       ),
     );
@@ -192,6 +276,18 @@ class _ConversationPageState extends State<ConversationPage> {
   //     selectedMessageIndex = -1;
   //   });
   // }
+  Widget _buildCallingText() {
+    return Center(
+      child: Text(
+        'Calling...',
+        style: TextStyle(
+          fontSize: 20,
+          fontWeight: FontWeight.bold,
+          color: Colors.black,
+        ),
+      ),
+    );
+  }
 
   Widget _buildMessageList() {
     String senderId = currentUser!.uid;
@@ -385,7 +481,7 @@ class _ConversationPageState extends State<ConversationPage> {
                 currentUser!.uid,
                 widget.user['uid'],
                 newMessage,
-                MessageType.text,
+                MessageKind.text,
               );
               DocumentSnapshot currentUserTokenDoc = await FirebaseFirestore
                   .instance

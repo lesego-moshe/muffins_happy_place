@@ -1,11 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-enum MessageType { text, image, video, audio, document }
+enum MessageKind { text, image, video, audio, document }
 
 class Message {
   final String senderId;
   final String receiverId;
-  final MessageType type;
+  final MessageKind type;
   final String content;
   final Timestamp timestamp;
   List<Message>? subMessages;

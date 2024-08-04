@@ -144,9 +144,14 @@ class _CalendarState extends State<Calendar> {
                           List.from(snapshot.data as Iterable)
                             ..sort((a, b) => a.date!.compareTo(b.date!));
 
-                      Event nextEvent = sortedEvents.firstWhere(
-                        (event) => event.date!.isAfter(DateTime.now()),
-                      );
+                      Event? nextEvent;
+
+                      for (var event in sortedEvents) {
+                        if (event.date!.isAfter(DateTime.now())) {
+                          nextEvent = event;
+                          break;
+                        }
+                      }
 
                       return Column(
                         children: [
